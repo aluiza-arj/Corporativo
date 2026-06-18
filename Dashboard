@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Carteira Corporativa — Águas Claras</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --creme:#FDF9F0;
+  --azul:#324569;
+  --verde:#405941;
+  --roxo:#56336D;
+  --grafite:#2C2C2C;
+  --amarelo:#C9882A;
+  --vermelho:#B03A2E;
+  --azul2:#4A6FA5;
+  --verde2:#6A9B6B;
+  --roxo2:#8B5AA8;
+  --grafite2:#666;
+  --azul3:#7EA3CC;
+  --borda:rgba(44,44,44,.10);
+  --sombra:0 2px 14px rgba(44,44,44,.07);
+  --sombra-lg:0 8px 40px rgba(44,44,44,.14);
+}
+
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  background:var(--creme);
+  color:var(--grafite);
+  min-height:100vh;
+  font-size:14px;
+  line-height:1.5;
+}
+
+/* ── HEADER ─────────────────────────────── */
+header{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  background:var(--azul);
+  height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 36px;
+  box-shadow:0 2px 20px rgba(50,69,105,.28);
+}
+.hd-brand{display:flex;align-items:center;gap:14px}
+.hd-mono{
+  width:36px;height:36px;border-radius:9px;
+  background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:13px;color:#FDF9F0;letter-spacing:.5px
+}
+.hd-title{font-size:15px;font-weight:600;color:#FDF9F0;letter-spacing:.1px}
+.hd-sub{font-size:11px;color:rgba(253,249,240,.55);margin-top:1px}
+.hd-date{text-align:right;color:rgba(253,249,240,.65);font-size:12px}
+.hd-date b{display:block;color:#FDF9F0;font-size:13px;font-weight:600}
+
+/* ── LAYOUT ─────────────────────────────── */
+main{padding:80px 36px 56px;max-width:1440px;margin:0 auto}
+
+/* ── TABS ────────────────────────────────── */
+.tabs{
+  display:flex;gap:4px;
+  background:rgba(50,69,105,.08);
+  border-radius:11px;padding:4px;
+  width:fit-content;margin-bottom:30px;
+}
+.tab-btn{
+  padding:8px 26px;border:none;border-radius:8px;
+  background:transparent;color:var(--grafite);
+  font-size:13px;font-weight:500;cursor:pointer;
+  transition:all .18s;opacity:.6;letter-spacing:.1px;
+}
+.tab-btn.active{
+  background:#fff;color:var(--azul);font-weight:700;opacity:1;
+  box-shadow:0 1px 8px rgba(50,69,105,.13);
+}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* ── KPI CARDS ───────────────────────────── */
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.kpi-card{
+  background:#fff;border-radius:13px;padding:20px 22px;
+  box-shadow:var(--sombra);border:1px solid var(--borda);
+  position:relative;overflow:hidden;
+}
+.kpi-card::after{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.kc-azul::after{background:var(--azul)}
+.kc-verde::after{background:var(--verde)}
+.kc-amarelo::after{background:var(--amarelo)}
+.kc-roxo::after{background:var(--roxo)}
+.kpi-lbl{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.85px;opacity:.45;margin-bottom:8px;
+}
+.kpi-val{
+  font-size:23px;font-weight:700;letter-spacing:-.5px;line-height:1.1;
+}
+.kpi-sub{font-size:11px;opacity:.45;margin-top:4px}
+.kpi-ico{
+  position:absolute;top:14px;right:18px;
+  font-size:22px;opacity:.08;
+}
+
+/* ── SECTION TITLE ───────────────────────── */
+.sec{
+  font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:1px;color:var(--azul);opacity:.65;
+  margin-bottom:14px;margin-top:30px;
+}
+
+/* ── TABLE ───────────────────────────────── */
+.tbl-wrap{
+  background:#fff;border-radius:13px;
+  box-shadow:var(--sombra);border:1px solid var(--borda);
+  overflow:hidden;margin-bottom:28px;
+}
+.tbl-head{
+  padding:14px 20px;border-bottom:1px solid var(--borda);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;
+}
+.tbl-head-ttl{font-size:13px;font-weight:600}
+.tbl-scroll{overflow-x:auto;max-height:420px;overflow-y:auto}
+.tbl-scroll::-webkit-scrollbar{width:5px;height:5px}
+.tbl-scroll::-webkit-scrollbar-thumb{background:rgba(50,69,105,.18);border-radius:10px}
+table{width:100%;border-collapse:collapse;min-width:680px}
+thead{position:sticky;top:0;z-index:2}
+thead th{
+  background:var(--creme);padding:9px 14px;text-align:left;
+  font-size:10.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;opacity:.5;border-bottom:1px solid var(--borda);
+  white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid rgba(44,44,44,.045);transition:background .12s}
+tbody tr:hover{background:rgba(50,69,105,.025)}
+tbody tr:last-child{border-bottom:none}
+td{padding:11px 14px;font-size:13px;white-space:nowrap}
+td.td-nome{font-weight:600;max-width:260px;white-space:normal;line-height:1.3}
+td.td-vgl{font-weight:600;color:var(--azul);font-variant-numeric:tabular-nums}
+td.td-loc{opacity:.65;font-size:12.5px;max-width:200px;white-space:normal;line-height:1.3}
+.row-inadimplente{background:rgba(176,58,46,.035)}
+.row-desocupado{background:rgba(201,136,42,.03)}
+
+/* ── BADGE ───────────────────────────────── */
+.badge{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 10px;border-radius:20px;
+  font-size:11px;font-weight:600;letter-spacing:.15px;white-space:nowrap;
+}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.b-verde{background:rgba(64,89,65,.12);color:var(--verde)}.b-verde::before{background:var(--verde)}
+.b-vermelho{background:rgba(176,58,46,.11);color:var(--vermelho)}.b-vermelho::before{background:var(--vermelho)}
+.b-cinza{background:rgba(44,44,44,.08);color:var(--grafite2)}.b-cinza::before{background:var(--grafite2)}
+.chip{
+  display:inline-block;padding:2px 9px;border-radius:6px;
+  font-size:11px;font-weight:500;
+  background:rgba(50,69,105,.07);color:var(--azul);
+}
+
+/* ── CHART BAR ───────────────────────────── */
+.chart-box{
+  background:#fff;border-radius:13px;
+  box-shadow:var(--sombra);border:1px solid var(--borda);
+  padding:24px;margin-bottom:28px;
+}
+.chart-ttl{
+  font-size:13px;font-weight:600;margin-bottom:18px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.chart-legend{display:flex;gap:16px;flex-wrap:wrap}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:11px;opacity:.6}
+.legend-dot{width:11px;height:11px;border-radius:3px;flex-shrink:0}
+.bar-container{height:200px}
+
+/* ── PIZZA GRID ─────────────────────────── */
+.pizza-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);
+  gap:20px;margin-bottom:28px;
+}
+.pizza-card{
+  background:#fff;border-radius:13px;
+  box-shadow:var(--sombra);border:1px solid var(--borda);
+  padding:22px 20px 18px;
+  display:flex;flex-direction:column;gap:14px;
+  cursor:default;
+}
+.pizza-card-ttl{
+  font-size:13px;font-weight:700;color:var(--grafite);
+}
+.pizza-card-sub{
+  font-size:11px;opacity:.45;margin-top:1px;font-weight:400;
+}
+.pizza-canvas-wrap{
+  width:160px;height:160px;margin:0 auto;position:relative;cursor:pointer;
+}
+.pizza-center-label{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;
+}
+.pizza-center-n{font-size:22px;font-weight:700;color:var(--grafite);line-height:1}
+.pizza-center-lbl{font-size:10px;opacity:.45;margin-top:3px;font-weight:500;letter-spacing:.3px}
+.pizza-legend{display:flex;flex-direction:column;gap:6px}
+.pizza-leg-row{
+  display:flex;align-items:center;gap:8px;
+  font-size:11.5px;cursor:pointer;padding:3px 6px;border-radius:6px;
+  transition:background .13s;
+}
+.pizza-leg-row:hover{background:rgba(50,69,105,.05)}
+.pizza-leg-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.pizza-leg-fase{flex:1;opacity:.8}
+.pizza-leg-n{font-weight:700;opacity:.7;font-size:12px}
+
+/* ── THROUGHPUT MINI BAR CHART ───────────── */
+.tp-wrap{
+  padding:10px 10px 8px;background:var(--creme);
+  border-radius:8px;border:1px solid var(--borda);
+}
+.tp-lbl{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.5px;color:var(--grafite2);opacity:.65;margin-bottom:8px;
+}
+.tp-bars{display:flex;align-items:flex-end;gap:6px;height:44px}
+.tp-col{display:flex;flex-direction:column;align-items:center;flex:1;gap:3px}
+.tp-bar{width:100%;border-radius:4px 4px 0 0;min-height:4px;position:relative}
+.tp-val{font-size:10px;font-weight:700;color:var(--grafite2);opacity:.7}
+.tp-mes{font-size:9.5px;opacity:.45;letter-spacing:.1px}
+
+/* ── SPARK TOOLTIP ───────────────────────── */
+#spark-tip{
+  position:fixed;z-index:999;
+  background:#2C2C2C;color:#FDF9F0;
+  padding:5px 10px;border-radius:6px;
+  font-size:11px;font-weight:600;white-space:nowrap;
+  pointer-events:none;display:none;
+  box-shadow:0 2px 8px rgba(44,44,44,.28);
+}
+
+/* ── COMERCIAL BLOCK ─────────────────────── */
+.comercial-grid{
+  display:flex;gap:28px;align-items:flex-start;
+}
+.funil-wrap{flex:1;min-width:0}
+.funil-row-wrap{margin-bottom:2px}
+.funil-bar{
+  height:42px;border-radius:8px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 14px;color:#FDF9F0;font-size:13px;font-weight:600;
+}
+.funil-bar-label{opacity:.92;letter-spacing:.1px}
+.funil-bar-count{font-size:18px;font-weight:700}
+.funil-conv{
+  display:flex;align-items:center;justify-content:flex-start;
+  padding-left:14px;gap:4px;
+  margin:3px 0;font-size:11px;color:var(--grafite2);opacity:.7;
+}
+.funil-legend{
+  font-size:11px;color:var(--grafite2);opacity:.65;
+  margin-top:12px;line-height:1.6;border-top:1px solid var(--borda);
+  padding-top:10px;
+}
+.spark-wrap{flex:1;min-width:0}
+.spark-ttl{
+  font-size:10.5px;font-weight:700;color:var(--azul);opacity:.65;
+  text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;
+}
+.spark-row{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:8px;padding:8px 10px;
+  background:var(--creme);border-radius:8px;
+}
+.spark-dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
+.spark-nome{font-size:11.5px;font-weight:600;width:78px;flex-shrink:0;opacity:.8}
+.spark-svg-wrap{flex:1}
+.spark-val{font-size:15px;font-weight:700;width:22px;text-align:right;flex-shrink:0}
+.comercial-footer{
+  display:flex;gap:12px;margin-top:20px;flex-wrap:wrap;
+}
+.com-mini{
+  flex:1;min-width:100px;background:var(--creme);
+  border-radius:10px;padding:12px 16px;border:1px solid var(--borda);
+}
+.com-mini-lbl{
+  font-size:10px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.7px;opacity:.45;margin-bottom:4px;
+}
+.com-mini-val{font-size:20px;font-weight:700;color:var(--azul)}
+.com-mini-sub{font-size:11px;opacity:.4;margin-top:2px}
+
+/* ── DRAWER ──────────────────────────────── */
+.overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(44,44,44,.45);backdrop-filter:blur(2px);
+  cursor:pointer;
+}
+.overlay.open{display:block}
+.drawer{
+  position:fixed;top:0;right:0;bottom:0;z-index:301;
+  width:420px;max-width:96vw;
+  background:#fff;
+  box-shadow:-8px 0 48px rgba(44,44,44,.16);
+  transform:translateX(100%);transition:transform .28s cubic-bezier(.4,0,.2,1);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.drawer.open{transform:translateX(0)}
+.drawer-head{
+  padding:22px 24px 18px;
+  border-bottom:1px solid var(--borda);
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+  background:var(--creme);flex-shrink:0;
+}
+.drawer-head-info{}
+.drawer-processo{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--azul);opacity:.6;margin-bottom:4px}
+.drawer-fase{font-size:16px;font-weight:700;color:var(--grafite)}
+.drawer-count{
+  margin-top:6px;font-size:12px;opacity:.5;
+}
+.drawer-close{
+  background:rgba(44,44,44,.08);border:none;border-radius:8px;
+  width:32px;height:32px;cursor:pointer;font-size:16px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  color:var(--grafite);transition:background .13s;
+}
+.drawer-close:hover{background:rgba(44,44,44,.15)}
+.drawer-body{flex:1;overflow-y:auto;padding:16px 20px}
+.drawer-body::-webkit-scrollbar{width:5px}
+.drawer-body::-webkit-scrollbar-thumb{background:rgba(50,69,105,.18);border-radius:10px}
+.drawer-item{
+  padding:14px 16px;border-radius:10px;
+  border:1px solid var(--borda);margin-bottom:10px;
+  background:var(--creme);
+}
+.drawer-item-nome{font-size:13px;font-weight:600;margin-bottom:4px}
+.drawer-item-loc{font-size:12px;opacity:.55;margin-bottom:6px}
+.drawer-item-obs{font-size:12px;opacity:.65;line-height:1.45}
+.drawer-empty{text-align:center;padding:40px 20px;opacity:.35;font-size:13px}
+.fase-dot{
+  display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;
+}
+
+/* ── RESPONSIVE ─────────────────────────── */
+@media(max-width:1100px){.pizza-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:860px){
+  main{padding:74px 18px 48px}
+  header{padding:0 18px}
+  .kpi-grid{grid-template-columns:repeat(2,1fr)}
+  .pizza-grid{grid-template-columns:1fr 1fr}
+  .comercial-grid{flex-direction:column}
+}
+@media(max-width:560px){
+  .kpi-grid{grid-template-columns:1fr}
+  .pizza-grid{grid-template-columns:1fr}
+  .tabs{width:100%}
+  .tab-btn{flex:1;padding:8px 12px;font-size:12px}
+  .drawer{width:100%;max-width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hd-brand">
+    <div class="hd-mono">CC</div>
+    <div>
+      <div class="hd-title">Carteira Corporativa — Águas Claras</div>
+      <div class="hd-sub">Brasília · Portfólio de Alto Padrão</div>
+    </div>
+  </div>
+  <div class="hd-date">
+    <b id="data-atual"></b>
+    <span>Relatório executivo</span>
+  </div>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('financeiro',this)">Saúde Financeira</button>
+    <button class="tab-btn" onclick="showTab('processos',this)">Acompanhamento de Processos</button>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       ABA 1 — SAÚDE FINANCEIRA
+  ══════════════════════════════════════ -->
+  <div id="tab-financeiro" class="tab-panel active">
+
+    <div class="kpi-grid">
+      <div class="kpi-card kc-azul">
+        <div class="kpi-lbl">VGL Anunciado</div>
+        <div class="kpi-val" id="k-potencial"></div>
+        <div class="kpi-sub" id="k-potencial-sub"></div>
+        <div class="kpi-ico">◈</div>
+      </div>
+      <div class="kpi-card kc-amarelo">
+        <div class="kpi-lbl">Receita Prevista</div>
+        <div class="kpi-val" id="k-prevista"></div>
+        <div class="kpi-sub" id="k-prevista-sub"></div>
+        <div class="kpi-ico">◎</div>
+      </div>
+      <div class="kpi-card kc-verde">
+        <div class="kpi-lbl">Receita Realizada — Jun/26</div>
+        <div class="kpi-val" id="k-realizada"></div>
+        <div class="kpi-sub" id="k-realizada-sub"></div>
+        <div class="kpi-ico">✓</div>
+      </div>
+      <div class="kpi-card kc-roxo">
+        <div class="kpi-lbl">Taxa de Ocupação</div>
+        <div class="kpi-val" id="k-ocupacao"></div>
+        <div class="kpi-sub" id="k-ocupacao-sub"></div>
+        <div class="kpi-ico">%</div>
+      </div>
+    </div>
+
+    <div class="sec">Imóveis da Carteira</div>
+    <div class="tbl-wrap">
+      <div class="tbl-head">
+        <span class="tbl-head-ttl">30 imóveis · Águas Claras, Brasília</span>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="badge b-verde"><span id="cnt-oc"></span> Ocupados</span>
+          <span class="badge b-cinza"><span id="cnt-des"></span> Desocupados</span>
+          <span class="badge b-vermelho"><span id="cnt-inad"></span> Inadimplentes</span>
+        </div>
+      </div>
+      <div class="tbl-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nome do Imóvel</th>
+              <th>Tipo</th>
+              <th>Status</th>
+              <th>VGL</th>
+              <th>Locatário</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-imoveis"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="chart-box">
+      <div class="chart-ttl">
+        Receita Prevista vs. Realizada — Últimos 6 Meses
+        <div class="chart-legend">
+          <span class="legend-item"><span class="legend-dot" style="background:var(--azul)"></span>Prevista</span>
+          <span class="legend-item"><span class="legend-dot" style="background:var(--verde)"></span>Realizada</span>
+        </div>
+      </div>
+      <div class="bar-container"><canvas id="grafico-bar"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- ══════════════════════════════════════
+       ABA 2 — PROCESSOS
+  ══════════════════════════════════════ -->
+  <div id="tab-processos" class="tab-panel">
+
+    <!-- Visão Comercial inserida antes das pizzas -->
+    <div class="chart-box" id="box-comercial"></div>
+
+    <div class="sec">Acompanhamento por Processo — clique em uma fatia para ver os imóveis</div>
+
+    <div class="pizza-grid" id="pizza-grid"></div>
+
+  </div>
+</main>
+
+<div id="spark-tip"></div>
+
+<!-- DRAWER -->
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-head-info">
+      <div class="drawer-processo" id="drawer-processo"></div>
+      <div class="drawer-fase" id="drawer-fase"></div>
+      <div class="drawer-count" id="drawer-count"></div>
+    </div>
+    <button class="drawer-close" onclick="closeDrawer()">✕</button>
+  </div>
+  <div class="drawer-body" id="drawer-body"></div>
+</div>
+
+<script>
+// ╔══════════════════════════════════════════╗
+// ║  DADOS — MUDANÇA 1                       ║
+// ║  Distribuição: 24 Ocupado · 4 Desocupado ║
+// ║  · 2 Inadimplente                        ║
+// ║  VGLs e nomes preservados               ║
+// ╚══════════════════════════════════════════╝
+
+const IMOVEIS = [
+  {id:1,  nome:"Shopping Aquarela Águas Claras",        tipo:"Shopping",             status:"Ocupado",      vgl:490000, loc:"Shopping Aquarela S/A"},
+  {id:2,  nome:"Colégio Planalto — Unidade I",          tipo:"Colégio",              status:"Ocupado",      vgl:88000,  loc:"Grupo Educacional Planalto"},
+  {id:3,  nome:"Colégio Ágora",                         tipo:"Colégio",              status:"Inadimplente", vgl:72000,  loc:"Ágora Ensino Ltda."},
+  {id:4,  nome:"Colégio Dimensão — Ala Norte",          tipo:"Colégio",              status:"Ocupado",      vgl:65000,  loc:"Rede Dimensão de Ensino"},
+  {id:5,  nome:"Posto BR Águas Claras",                 tipo:"Posto de Gasolina",    status:"Ocupado",      vgl:42000,  loc:"Petrobrás Distribuidora"},
+  {id:6,  nome:"Posto Shell — Via Lúcio Costa",         tipo:"Posto de Gasolina",    status:"Inadimplente", vgl:38000,  loc:"Distribuidora Luso Ltda."},
+  {id:7,  nome:"Posto Ipiranga Centro",                 tipo:"Posto de Gasolina",    status:"Ocupado",      vgl:36000,  loc:"Ipiranga Produtos S/A"},
+  {id:8,  nome:"Posto Raízen — Faixa 1",               tipo:"Posto de Gasolina",    status:"Desocupado",   vgl:33000,  loc:"— Disponível"},
+  {id:9,  nome:"Galpão Logístico Norte I",              tipo:"Galpão Logístico",     status:"Ocupado",      vgl:95000,  loc:"Transportadora Brasília S/A"},
+  {id:10, nome:"Galpão Logístico Norte II",             tipo:"Galpão Logístico",     status:"Ocupado",      vgl:88000,  loc:"Logística Centro-Oeste Ltda."},
+  {id:11, nome:"Galpão Omega — Módulo A",               tipo:"Galpão Logístico",     status:"Desocupado",   vgl:76000,  loc:"— Disponível"},
+  {id:12, nome:"Galpão Omega — Módulo B",               tipo:"Galpão Logístico",     status:"Ocupado",      vgl:74000,  loc:"Distribuidora Federal Ltda."},
+  {id:13, nome:"Galpão Industrial Aquila",              tipo:"Galpão Logístico",     status:"Ocupado",      vgl:68000,  loc:"Aquila Comércio e Distribuição"},
+  {id:14, nome:"Galpão CentroLog AC",                   tipo:"Galpão Logístico",     status:"Ocupado",      vgl:62000,  loc:"CentroLog Soluções Ltda."},
+  {id:15, nome:"Galpão Sul — Área 3",                   tipo:"Galpão Logístico",     status:"Ocupado",      vgl:55000,  loc:"FastLog Distribuidora Ltda."},
+  {id:16, nome:"Galpão Express Multimodal",             tipo:"Galpão Logístico",     status:"Ocupado",      vgl:48000,  loc:"Express Multimodal S/A"},
+  {id:17, nome:"Laje Corporativa Torre A",              tipo:"Laje Corporativa",     status:"Ocupado",      vgl:145000, loc:"TechBrasília Consultoria S/A"},
+  {id:18, nome:"Laje Corporativa Torre B",              tipo:"Laje Corporativa",     status:"Ocupado",      vgl:132000, loc:"Infraestrutura Alfa Ltda."},
+  {id:19, nome:"Escritório Premium — Andar 12",         tipo:"Laje Corporativa",     status:"Ocupado",      vgl:115000, loc:"Advocacia Meirelles & Prado"},
+  {id:20, nome:"Escritório Premium — Andar 15",         tipo:"Laje Corporativa",     status:"Desocupado",   vgl:115000, loc:"— Disponível"},
+  {id:21, nome:"Laje Comercial Horizonte",              tipo:"Laje Corporativa",     status:"Ocupado",      vgl:98000,  loc:"Horizonte Investimentos S/A"},
+  {id:22, nome:"Laje Flex — Bloco 3",                  tipo:"Laje Corporativa",     status:"Ocupado",      vgl:85000,  loc:"Grupo Flex Negócios Ltda."},
+  {id:23, nome:"Centro Empresarial Nexus",              tipo:"Laje Corporativa",     status:"Ocupado",      vgl:74000,  loc:"Nexus Gestão Empresarial"},
+  {id:24, nome:"Edifício Res. Comercial Altos do Park", tipo:"Residencial Comercial",status:"Ocupado",      vgl:52000,  loc:"Clínica Médica Saúde Total"},
+  {id:25, nome:"Residencial Comercial Vista Verde",     tipo:"Residencial Comercial",status:"Ocupado",      vgl:45000,  loc:"Farmácia VidaPlena"},
+  {id:26, nome:"Residencial Comercial Líder",           tipo:"Residencial Comercial",status:"Desocupado",   vgl:42000,  loc:"— Disponível"},
+  {id:27, nome:"Espaço Comercial Bela Vista",           tipo:"Residencial Comercial",status:"Ocupado",      vgl:38000,  loc:"Academia Fitness Corpo & Mente"},
+  {id:28, nome:"Residencial Comercial Orion",           tipo:"Residencial Comercial",status:"Ocupado",      vgl:35000,  loc:"Estúdio Pilates Forma & Vida"},
+  {id:29, nome:"Residencial Comercial Norte Park",      tipo:"Residencial Comercial",status:"Ocupado",      vgl:28000,  loc:"Studio Cabeleireiro Renata"},
+  {id:30, nome:"Galeria Comercial Primavera",           tipo:"Residencial Comercial",status:"Ocupado",      vgl:22000,  loc:"Ótica Visão Clara Ltda."},
+];
+
+// ── Processos ─────────────────────────────────────────────────────────────
+// Regras de consistência:
+//   Ciclo de vacância: Encerramento → Anúncio Comercial → Efetivação
+//   Cada desocupado (8, 11, 20, 26) em UM só processo desse ciclo:
+//     encerramento: 11 | anuncio: 8, 20 | efetivacao: 26
+//   inadimplencia → só Inadimplentes (3, 6)
+//   reparos + renovacao → só Ocupados
+// Ordem de renderização: anuncio, efetivacao, inadimplencia, reparos, renovacao, encerramento
+
+const PROCESSOS = {
+  anuncio: {
+    titulo: "Anúncio Comercial",
+    fases: ["Novo","Avaliação técnica","Aguardando fotos","Aguardando divulgação"],
+    itens: [
+      {imovelId:8,  fase:"Aguardando fotos",        obs:"Sessão de fotos agendada para 22/06. Planta e memorial descritivo prontos."},
+      {imovelId:20, fase:"Aguardando divulgação",   obs:"Material fotográfico aprovado. Aguardando publicação nos portais imobiliários."},
+    ]
+  },
+  efetivacao: {
+    titulo: "Efetivação da Locação",
+    fases: ["Proposta recebida","Em análise","Contrato em assinatura","Efetivado"],
+    itens: [
+      {imovelId:26, fase:"Proposta recebida",  obs:"Clínica odontológica interessada. Proposta formal recebida em 12/06."},
+    ]
+  },
+  inadimplencia: {
+    titulo: "Inadimplência",
+    fases: ["Notificado","Acordo em andamento","Jurídico","Regularizado"],
+    itens: [
+      {imovelId:3, fase:"Jurídico",            obs:"Inadimplência superior a 90 dias. Ação de despejo em andamento no TJDF."},
+      {imovelId:6, fase:"Acordo em andamento", obs:"Parcelamento de 4x acordado. 2 parcelas pagas. Monitoramento mensal."},
+    ]
+  },
+  reparos: {
+    titulo: "Reparos",
+    fases: ["Solicitado","Orçamento aprovado","Em execução","Concluído"],
+    itens: [
+      {imovelId:5,  fase:"Concluído",          obs:"Troca de bombas de combustível finalizada em 05/06/2026."},
+      {imovelId:9,  fase:"Em execução",        obs:"Reforma de doca de descarga em andamento. Prazo: 25/06."},
+      {imovelId:12, fase:"Orçamento aprovado", obs:"Substituição de telhas danificadas. Aguardando início da obra."},
+      {imovelId:14, fase:"Solicitado",         obs:"Goteira identificada no mezanino. Vistoria técnica solicitada."},
+      {imovelId:17, fase:"Concluído",          obs:"Modernização do elevador concluída. AVCB renovado."},
+      {imovelId:19, fase:"Em execução",        obs:"Impermeabilização de laje em execução. Previsão: 30/06."},
+      {imovelId:21, fase:"Orçamento aprovado", obs:"Ar condicionado central: substituição aprovada por R$ 48.000."},
+      {imovelId:23, fase:"Solicitado",         obs:"Esquadrias com problema de vedação. Aguardando orçamento."},
+      {imovelId:25, fase:"Concluído",          obs:"Troca de esquadrias concluída. Aprovada em assembleia condominial."},
+      {imovelId:27, fase:"Em execução",        obs:"Instalação de portão eletrônico com câmeras. 60% concluído."},
+    ]
+  },
+  renovacao: {
+    titulo: "Renovação de Contrato",
+    fases: ["Notificado","Em negociação","Aguardando assinatura","Concluído"],
+    itens: [
+      {imovelId:2,  fase:"Concluído",             obs:"Renovação de 36 meses com reajuste IPCA+2%. Assinado em 01/06."},
+      {imovelId:4,  fase:"Aguardando assinatura", obs:"Minuta aprovada por ambas as partes. Aguarda coleta de assinaturas."},
+      {imovelId:9,  fase:"Em negociação",         obs:"Transportadora solicita redução de 5% em razão de mercado. Em análise."},
+      {imovelId:14, fase:"Notificado",            obs:"Notificação enviada 90 dias antes do vencimento em 15/09/2026."},
+      {imovelId:16, fase:"Em negociação",         obs:"Proposta de reajuste IGP-M enviada. Locatário pediu prazo de retorno."},
+      {imovelId:17, fase:"Notificado",            obs:"Contrato vence em out/26. Notificação formal enviada em mai."},
+      {imovelId:21, fase:"Aguardando assinatura", obs:"Renovação de 24 meses aprovada. Contrato na mesa do diretor financeiro."},
+      {imovelId:24, fase:"Concluído",             obs:"Renovação de 24 meses, reajuste INPC. Assinado digitalmente."},
+      {imovelId:29, fase:"Em negociação",         obs:"Locatário quer reduzir vigência para 12 meses. Contraproposta enviada."},
+    ]
+  },
+  encerramento: {
+    titulo: "Encerramento de Locação",
+    fases: ["Informou desocupação","Vistoria","Para anunciar"],
+    itens: [
+      {imovelId:11, fase:"Vistoria", obs:"Vistoria realizada em 10/06. Laudo com 3 ressalvas de reparo a resolver."},
+    ]
+  },
+};
+
+// ── Fase terminal por processo (excluída do donut WIP) ────────────────────
+// null = sem terminal (todas as fases são WIP)
+const TERMINAL_FASE = {
+  anuncio:      null,
+  efetivacao:   "Efetivado",
+  inadimplencia:"Regularizado",
+  reparos:      "Concluído",
+  renovacao:    "Concluído",
+  encerramento: null,
+};
+
+// MOCK — em produção: filtrar itens por data de conclusão no CRM/ClickUp
+// Pensar data_conclusao em cada item e arquivar da visão ativa na origem
+// MOCK — em produção: filtrar itens por data de conclusão no CRM/ClickUp
+// Pensar data_conclusao em cada item e arquivar da visão ativa na origem
+const THROUGHPUT = {
+  anuncio:      {Mar:2, Abr:1, Mai:2, Jun:2},  // anúncios publicados/mês
+  efetivacao:   {Mar:1, Abr:2, Mai:1, Jun:1},
+  inadimplencia:{Mar:1, Abr:2, Mai:1, Jun:2},
+  reparos:      {Mar:3, Abr:5, Mai:4, Jun:2},
+  renovacao:    {Mar:2, Abr:1, Mai:3, Jun:2},
+  encerramento: {Mar:2, Abr:1, Mai:2, Jun:1},  // rescisões/mês — KPI ARCOS Fase 4
+};
+
+// Rótulos de throughput por processo (quando o padrão "${termFase}s/mês" não se aplica)
+const THROUGHPUT_LBL = {
+  anuncio:      "Publicados/mês",
+  encerramento: "Concluídos/mês",
+};
+
+// MOCK — em produção: CRM/ClickUp (leads, visitas, propostas, fechamentos)
+const COMERCIAL = {
+  mesAtual: "Jun/26",
+  etapas: ["Leads","Visitas","Propostas","Fechamentos"],
+  cores:  ["#324569","#4A6FA5","#56336D","#405941"],
+  atual:  [11, 6, 3, 1],
+  cicloMedioDias: 50,
+  tendencia: {
+    meses:       ["Mar/26","Abr/26","Mai/26","Jun/26"],
+    Leads:       [14, 12, 10, 11],
+    Visitas:     [7,  6,  5,  6],
+    Propostas:   [3,  3,  2,  3],
+    Fechamentos: [2,  1,  1,  1]
+  }
+};
+
+// ── Paleta de cores por processo ─────────────
+const CORES = {
+  anuncio:      ["#C9882A","#D6A24F","#E3BC7C","#F0D6AC"],
+  efetivacao:   ["#56336D","#8B5AA8","#B388CC","#D8BBEA"],
+  inadimplencia:["#B03A2E","#D9534F","#E88784","#F5C6C5"],
+  reparos:      ["#405941","#6A9B6B","#8FBA91","#C2DFC3"],
+  renovacao:    ["#2C2C2C","#555","#888","#BBB"],
+  encerramento: ["#324569","#4A6FA5","#7EA3CC"],
+};
+
+// ╔══════════════════════════════════════════╗
+// ║  HELPERS                                 ║
+// ╚══════════════════════════════════════════╝
+function fmt(v){return"R$ "+Math.round(v).toLocaleString("pt-BR",{minimumFractionDigits:0})}
+function im(id){return IMOVEIS.find(x=>x.id===id)}
+function today(){
+  return new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"long",year:"numeric"});
+}
+function soma(arr){return arr.reduce((s,i)=>s+i.vgl,0)}
+
+// ╔══════════════════════════════════════════╗
+// ║  TABS                                    ║
+// ╚══════════════════════════════════════════╝
+function showTab(id,btn){
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+id).classList.add("active");
+  btn.classList.add("active");
+}
+
+// ╔══════════════════════════════════════════╗
+// ║  ABA 1 — FINANCEIRO (Mudança 2 + 3)      ║
+// ╚══════════════════════════════════════════╝
+function initFinanceiro(){
+  // ── Cascata de receita ────────────────────
+  const ocupados      = IMOVEIS.filter(i=>i.status==="Ocupado");
+  const inadimplentes = IMOVEIS.filter(i=>i.status==="Inadimplente");
+  const desocupados   = IMOVEIS.filter(i=>i.status==="Desocupado");
+  const comContrato   = ocupados.concat(inadimplentes);
+
+  const vglAnunciado    = soma(IMOVEIS);
+  const vacancia        = soma(desocupados);
+  const receitaPrevista = vglAnunciado - vacancia;   // = soma(comContrato)
+  const inadimplencia   = soma(inadimplentes);
+  const receitaRealizada= receitaPrevista - inadimplencia; // = soma(ocupados)
+  const taxaOcupacao    = Math.round(comContrato.length / IMOVEIS.length * 100);
+
+  // ── KPI cards ─────────────────────────────
+  document.getElementById("k-potencial").textContent    = fmt(vglAnunciado);
+  document.getElementById("k-potencial-sub").textContent= "Soma dos aluguéis anunciados · "+IMOVEIS.length+" imóveis";
+
+  document.getElementById("k-prevista").textContent     = fmt(receitaPrevista);
+  document.getElementById("k-prevista-sub").textContent = "Contratos ativos · −"+fmt(vacancia)+" em vacância";
+
+  document.getElementById("k-realizada").textContent    = fmt(receitaRealizada);
+  document.getElementById("k-realizada-sub").textContent= "Recebido · −"+fmt(inadimplencia)+" de inadimplência";
+
+  document.getElementById("k-ocupacao").textContent     = taxaOcupacao+"%";
+  document.getElementById("k-ocupacao-sub").textContent = comContrato.length+" de "+IMOVEIS.length+" imóveis com contrato";
+
+  // ── Badges de contagem ─────────────────────
+  document.getElementById("cnt-oc").textContent   = ocupados.length;
+  document.getElementById("cnt-des").textContent  = desocupados.length;
+  document.getElementById("cnt-inad").textContent = inadimplentes.length;
+
+  // ── Tabela ─────────────────────────────────
+  const tbody=document.getElementById("tbody-imoveis");
+  let html="";
+  IMOVEIS.forEach(im=>{
+    let bc="b-cinza",bl="Desocupado",rowC="row-desocupado";
+    if(im.status==="Ocupado"){bc="b-verde";bl="Ocupado";rowC=""}
+    else if(im.status==="Inadimplente"){bc="b-vermelho";bl="Inadimplente";rowC="row-inadimplente"}
+    html+=`<tr class="${rowC}">
+      <td style="opacity:.3;font-variant-numeric:tabular-nums">${im.id}</td>
+      <td class="td-nome">${im.nome}</td>
+      <td><span class="chip">${im.tipo}</span></td>
+      <td><span class="badge ${bc}">${bl}</span></td>
+      <td class="td-vgl">${fmt(im.vgl)}</td>
+      <td class="td-loc">${im.loc}</td>
+    </tr>`;
+  });
+  tbody.innerHTML=html;
+
+  // ── Gráfico: Prevista vs. Realizada ────────
+  // Último ponto (Jun/26) = valores computados acima; 5 meses anteriores = mocks
+  // relativos a Jun. O espaço entre as duas barras representa inadimplência do mês.
+  // MOCK — em produção: série histórica do CRM
+  const meses=["Jan/26","Fev/26","Mar/26","Abr/26","Mai/26","Jun/26"];
+  // MOCK — multiplicadores irregulares sobre Jun (rescisões/novos contratos)
+  const MP       = [0.89, 0.97, 0.86, 1.02, 0.94, 1.00]; // Jan..Jun
+  const inadCoef = [0.19, 0.08, 0.23, 0.06, 0.15, inadimplencia/receitaPrevista];
+  const pot  = MP.map(m=>Math.round(receitaPrevista*m/1000)*1000);
+  const real = pot.map((p,i)=>Math.round(p*(1-inadCoef[i])/1000)*1000);
+  pot[5]  = receitaPrevista;   // último mês = exato dos cards
+  real[5] = receitaRealizada;
+
+  new Chart(document.getElementById("grafico-bar").getContext("2d"),{
+    type:"bar",
+    data:{
+      labels:meses,
+      datasets:[
+        {label:"Prevista",data:pot,
+         backgroundColor:"rgba(50,69,105,.13)",borderColor:"rgba(50,69,105,.45)",
+         borderWidth:1.5,borderRadius:5},
+        {label:"Realizada",data:real,
+         backgroundColor:"rgba(64,89,65,.78)",borderColor:"transparent",
+         borderRadius:5}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{
+          callbacks:{label:c=>" "+fmt(c.raw)},
+          backgroundColor:"#2C2C2C",padding:10,cornerRadius:8,
+          titleFont:{size:12},bodyFont:{size:12}
+        }
+      },
+      scales:{
+        x:{grid:{display:false},ticks:{font:{size:11},color:"rgba(44,44,44,.45)"}},
+        y:{grid:{color:"rgba(44,44,44,.05)"},ticks:{font:{size:11},color:"rgba(44,44,44,.45)",
+          callback:v=>"R$ "+(v/1000000).toFixed(1)+"M"}}
+      }
+    }
+  });
+}
+
+// ╔══════════════════════════════════════════╗
+// ║  ABA 2 — COMERCIAL (Mudança 4A)          ║
+// ╚══════════════════════════════════════════╝
+// Tooltip HTML global para sparklines
+function showSparkTip(e, label, val){
+  const tip=document.getElementById("spark-tip");
+  tip.textContent=label+": "+val;
+  tip.style.display="block";
+  _positionSparkTip(e);
+}
+function _positionSparkTip(e){
+  const tip=document.getElementById("spark-tip");
+  const ox=14, oy=-32;
+  let x=e.clientX+ox, y=e.clientY+oy;
+  // Evitar corte na borda direita/superior
+  const tw=tip.offsetWidth||80;
+  if(x+tw>window.innerWidth-8) x=e.clientX-tw-6;
+  if(y<8) y=e.clientY+16;
+  tip.style.left=x+"px";
+  tip.style.top=y+"px";
+}
+function hideSparkTip(){
+  document.getElementById("spark-tip").style.display="none";
+}
+
+function sparkSVG(data, cor, meses){
+  const W=100, H=32;
+  const min=Math.min(...data), max=Math.max(...data);
+  const range=max-min||1;
+  const coords=data.map((v,i)=>({
+    x:Math.round(i/(data.length-1)*W),
+    y:Math.round(H-((v-min)/range*(H-6))-3)
+  }));
+  const pts=coords.map(c=>c.x+","+c.y).join(" ");
+  // Círculo visível (r=3) + hit target transparente (r=9) com handler inline
+  // <title> como rede de segurança; handler JS como tooltip rico
+  const dots=coords.map((c,i)=>`
+    <circle cx="${c.x}" cy="${c.y}" r="3" fill="${cor}" pointer-events="none"/>
+    <circle cx="${c.x}" cy="${c.y}" r="9" fill="transparent" style="cursor:pointer"
+      onmouseenter="showSparkTip(event,'${meses[i]}',${data[i]})"
+      onmouseleave="hideSparkTip()">
+      <title>${meses[i]}: ${data[i]}</title>
+    </circle>`).join("");
+  return`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="display:block;width:100%;height:32px;overflow:visible">
+    <polyline points="${pts}" fill="none" stroke="${cor}" stroke-width="2"
+      stroke-linejoin="round" stroke-linecap="round" opacity=".85"/>
+    ${dots}
+  </svg>`;
+}
+
+function initComercial(){
+  const box=document.getElementById("box-comercial");
+  const {etapas,cores,atual,tendencia,mesAtual,cicloMedioDias}=COMERCIAL;
+  const maxVal=atual[0];
+
+  // Conversões etapa a etapa
+  const convs=etapas.slice(0,-1).map((_,i)=>Math.round(atual[i+1]/atual[i]*100));
+  const convTotal=Math.round(atual[atual.length-1]/atual[0]*100);
+  const propostas=atual[2];
+
+  // ── Funil HTML ─────────────────────────────
+  let funilHTML="";
+  const MIN_PCT=14; // piso só para o rótulo caber; não distorce a escala visual
+  etapas.forEach((nome,i)=>{
+    const pct=Math.max(MIN_PCT, Math.round(atual[i]/maxVal*100));
+    const narrow=pct<=MIN_PCT; // se no piso, número vai pra fora da barra
+    funilHTML+=`<div class="funil-row-wrap" style="display:flex;align-items:center">
+      <div class="funil-bar" style="width:${pct}%;background:${cores[i]};${narrow?"justify-content:flex-start":""}">
+        <span class="funil-bar-label">${nome}</span>
+        ${narrow?"":`<span class="funil-bar-count">${atual[i]}</span>`}
+      </div>
+      ${narrow?`<span style="margin-left:8px;font-size:16px;font-weight:700;color:${cores[i]}">${atual[i]}</span>`:""}`;
+    if(i<etapas.length-1){
+      funilHTML+=`<div class="funil-conv">▾ ${convs[i]}% avançam</div>`;
+    }
+    funilHTML+="</div>";
+  });
+  funilHTML+=`<div class="funil-legend">
+    Movimento comercial de ${mesAtual} — estado de cada proposta detalhado em
+    <em>Efetivação da Locação</em>, nas pizzas abaixo (não há dupla contagem).
+  </div>`;
+
+  // ── Sparklines HTML ────────────────────────
+  let sparkHTML=`<div class="spark-ttl">Tendência · 4 meses</div>`;
+  etapas.forEach((nome,i)=>{
+    const serie=tendencia[nome];
+    sparkHTML+=`<div class="spark-row">
+      <span class="spark-dot" style="background:${cores[i]}"></span>
+      <span class="spark-nome">${nome}</span>
+      <span class="spark-svg-wrap">${sparkSVG(serie,cores[i],tendencia.meses)}</span>
+      <span class="spark-val" style="color:${cores[i]}">${atual[i]}</span>
+    </div>`;
+  });
+
+  // ── Rodapé mini-cards ──────────────────────
+  const footerHTML=`<div class="comercial-footer">
+    <div class="com-mini">
+      <div class="com-mini-lbl">Conversão total</div>
+      <div class="com-mini-val">${convTotal}%</div>
+      <div class="com-mini-sub">Leads → Fechamentos</div>
+    </div>
+    <div class="com-mini">
+      <div class="com-mini-lbl">Ciclo médio</div>
+      <div class="com-mini-val">${cicloMedioDias} dias</div>
+      <div class="com-mini-sub">Lead → assinatura</div>
+    </div>
+    <div class="com-mini">
+      <div class="com-mini-lbl">Propostas ativas</div>
+      <div class="com-mini-val">${propostas}</div>
+      <div class="com-mini-sub">${mesAtual}</div>
+    </div>
+  </div>`;
+
+  box.innerHTML=`
+    <div class="chart-ttl">Visão Comercial — ${mesAtual}</div>
+    <div class="comercial-grid">
+      <div class="funil-wrap">${funilHTML}</div>
+      <div class="spark-wrap">${sparkHTML}</div>
+    </div>
+    ${footerHTML}
+  `;
+}
+
+// ╔══════════════════════════════════════════╗
+// ║  ABA 2 — PROCESSOS / PIZZAS (Mudança 4B) ║
+// ╚══════════════════════════════════════════╝
+const chartInstances={};
+
+function initProcessos(){
+  const grid=document.getElementById("pizza-grid");
+  grid.innerHTML="";
+
+  Object.entries(PROCESSOS).forEach(([key,proc])=>{
+    const cores=CORES[key];
+    const termFase=TERMINAL_FASE[key];
+
+    // Separar fases WIP das terminais
+    const wipFases=termFase ? proc.fases.filter(f=>f!==termFase) : proc.fases;
+    const wipItens=termFase ? proc.itens.filter(it=>it.fase!==termFase) : proc.itens;
+    const totalWIP=wipItens.length;
+    const totalAll=proc.itens.length;
+
+    // Contagem por fase WIP
+    const faseCounts={};
+    wipFases.forEach(f=>faseCounts[f]=0);
+    wipItens.forEach(it=>faseCounts[it.fase]=(faseCounts[it.fase]||0)+1);
+
+    const card=document.createElement("div");
+    card.className="pizza-card";
+
+    // Legenda só com fases WIP
+    let legHTML=wipFases.map((f,i)=>`
+      <div class="pizza-leg-row" onclick="openDrawer('${key}','${f}')" title="Ver imóveis: ${f}">
+        <span class="pizza-leg-dot" style="background:${cores[i]||cores[cores.length-1]}"></span>
+        <span class="pizza-leg-fase">${f}</span>
+        <span class="pizza-leg-n">${faseCounts[f]||0}</span>
+      </div>`).join("");
+
+    // Mini bar chart de throughput (processos com terminal + encerramento)
+    let throughputHTML="";
+    if(THROUGHPUT[key]){
+      const tp=THROUGHPUT[key];
+      const entries=Object.entries(tp); // [["Mar",n],...]
+      const maxTp=Math.max(...entries.map(([,n])=>n))||1;
+      const accentCor=CORES[key][0];
+      const lastIdx=entries.length-1;
+      const barsHTML=entries.map(([mes,n],i)=>{
+        const hPct=Math.max(9,Math.round(n/maxTp*100));
+        const cor=i===lastIdx ? accentCor : "rgba(44,44,44,.12)";
+        return`<div class="tp-col">
+          <span class="tp-val">${n}</span>
+          <div class="tp-bar" style="height:${hPct}%;background:${cor}"></div>
+          <span class="tp-mes">${mes}</span>
+        </div>`;
+      }).join("");
+      const lbl=THROUGHPUT_LBL[key] || (termFase ? `${termFase}s/mês` : "Concluídos/mês");
+      throughputHTML=`<div class="tp-wrap">
+        <div class="tp-lbl">${lbl}</div>
+        <div class="tp-bars">${barsHTML}</div>
+      </div>`;
+    }
+
+    const subLbl=termFase
+      ? `${totalWIP} ativo${totalWIP!==1?"s":""} · ${totalAll-totalWIP} ${termFase.toLowerCase()}${totalAll-totalWIP!==1?"s":""}`
+      : `${totalWIP} item${totalWIP!==1?"s":""} em andamento`;
+
+    card.innerHTML=`
+      <div>
+        <div class="pizza-card-ttl">${proc.titulo}</div>
+        <div class="pizza-card-sub">${subLbl}</div>
+      </div>
+      <div class="pizza-canvas-wrap" id="wrap-${key}">
+        <canvas id="chart-${key}"></canvas>
+        <div class="pizza-center-label">
+          <div class="pizza-center-n">${totalWIP}</div>
+          <div class="pizza-center-lbl">ativos</div>
+        </div>
+      </div>
+      <div class="pizza-legend">${legHTML}</div>
+      ${throughputHTML}
+    `;
+    grid.appendChild(card);
+
+    // Donut apenas com fases WIP
+    const ctx=card.querySelector(`#chart-${key}`).getContext("2d");
+    const data=wipFases.map(f=>faseCounts[f]||0);
+    // Evitar donut vazio (todos zeros)
+    const hasData=data.some(v=>v>0);
+
+    const ch=new Chart(ctx,{
+      type:"doughnut",
+      data:{
+        labels:wipFases,
+        datasets:[{
+          data: hasData ? data : wipFases.map(()=>1),
+          backgroundColor: wipFases.map((_,i)=>cores[i]||cores[cores.length-1]),
+          borderWidth:2,
+          borderColor:"#fff",
+          hoverOffset:6,
+        }]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:true,
+        cutout:"62%",
+        plugins:{
+          legend:{display:false},
+          tooltip:{
+            enabled: hasData,
+            callbacks:{
+              label:c=>{
+                const fase=c.label;
+                const n=c.raw;
+                return ` ${fase}: ${n} imóve${n!==1?"is":"l"}`;
+              }
+            },
+            backgroundColor:"#2C2C2C",padding:10,cornerRadius:8,
+            titleFont:{size:12},bodyFont:{size:12}
+          }
+        },
+        onClick:(_,els)=>{
+          if(!els.length||!hasData)return;
+          const fase=wipFases[els[0].index];
+          openDrawer(key,fase);
+        }
+      }
+    });
+    chartInstances[key]=ch;
+  });
+}
+
+// ╔══════════════════════════════════════════╗
+// ║  DRAWER                                  ║
+// ╚══════════════════════════════════════════╝
+function openDrawer(processoKey, fase){
+  const proc=PROCESSOS[processoKey];
+  const cores=CORES[processoKey];
+  const faseIdx=proc.fases.indexOf(fase);
+  const cor=cores[faseIdx]||cores[cores.length-1];
+  const itens=proc.itens.filter(it=>it.fase===fase);
+
+  document.getElementById("drawer-processo").textContent=proc.titulo;
+  document.getElementById("drawer-fase").innerHTML=
+    `<span class="fase-dot" style="background:${cor}"></span>${fase}`;
+  document.getElementById("drawer-count").textContent=
+    `${itens.length} imóve${itens.length!==1?"is":"l"} nesta fase`;
+
+  let body="";
+  if(!itens.length){
+    body=`<div class="drawer-empty">Nenhum imóvel nesta fase no momento.</div>`;
+  } else {
+    itens.forEach(it=>{
+      const imovel=im(it.imovelId);
+      if(!imovel)return;
+      let bc="b-cinza",bl="Desocupado";
+      if(imovel.status==="Ocupado"){bc="b-verde";bl="Ocupado"}
+      else if(imovel.status==="Inadimplente"){bc="b-vermelho";bl="Inadimplente"}
+      body+=`
+        <div class="drawer-item">
+          <div class="drawer-item-nome">${imovel.nome}</div>
+          <div class="drawer-item-loc">
+            <span class="badge ${bc}" style="font-size:10px;padding:2px 8px">${bl}</span>
+            &nbsp;${imovel.loc}
+          </div>
+          <div class="drawer-item-obs">${it.obs}</div>
+        </div>`;
+    });
+  }
+  document.getElementById("drawer-body").innerHTML=body;
+
+  document.getElementById("overlay").classList.add("open");
+  document.getElementById("drawer").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function closeDrawer(){
+  document.getElementById("overlay").classList.remove("open");
+  document.getElementById("drawer").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeDrawer()});
+
+// ╔══════════════════════════════════════════╗
+// ║  INIT                                    ║
+// ╚══════════════════════════════════════════╝
+document.getElementById("data-atual").textContent=today();
+initFinanceiro();
+initProcessos();
+initComercial();
+</script>
+</body>
+</html>
